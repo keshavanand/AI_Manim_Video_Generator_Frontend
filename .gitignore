@@ -1,0 +1,69 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+.pnpm/
+.bun/
+
+# Build output
+dist/
+dist-ssr/
+out/
+build/
+
+# Local env files
+.env
+.env.*.local
+*.local
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Optional: lock files (only if you prefer)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# TypeScript
+*.tsbuildinfo
+
+# SASS/SCSS cache
+.sass-cache/
+
+# Tailwind JIT
+.tailwind-cache/
+
+# Coverage & test output
+coverage/
+*.lcov
+jest-coverage/
+
+# Misc
+*.tgz
+*.zip
+*.bak
+*.tmp
+
+# VSCode Remote Containers
+.devcontainer/
+
+# Storybook
+.storybook-out/
