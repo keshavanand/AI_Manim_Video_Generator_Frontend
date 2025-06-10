@@ -11,14 +11,17 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
+    "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.513.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "ui": "github:shadcn/ui",
+    "zod": "^3.25.57",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
