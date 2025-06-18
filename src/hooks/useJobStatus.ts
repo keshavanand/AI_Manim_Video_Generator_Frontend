@@ -1,1 +1,0 @@
-//polls or uses WebSocket for Celery job progress
