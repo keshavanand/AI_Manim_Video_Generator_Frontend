@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginForm from './pages/Login'
 import RegisterForm from './pages/Register'
 import Dasboard from './pages/Dasboard'
@@ -23,6 +23,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </div>
   )

@@ -24,3 +24,4 @@ export const useAuthStore = create<AuthStore>((set) => ({
     // Clear authentication state (logout)
     clearAuth: () => set({ user: null, token: null }),
 }));
+

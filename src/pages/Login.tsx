@@ -4,6 +4,7 @@ import { LoginUserSchema, type LoginUser } from "@/zodTypes/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
     const { login, loading, error } = useAuth();
@@ -14,6 +15,8 @@ export default function LoginForm() {
 
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
+
+    const navigate = useNavigate();
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setUser({ ...user, [e.target.name]: e.target.value });
@@ -58,18 +61,18 @@ export default function LoginForm() {
                 </div>
                 <label
                     className="text-xs text-cyan-200 font-semibold mb-1"
-                    htmlFor="email"
+                    htmlFor="username"
                 >
-                    Email
+                    Username
                 </label>
                 <Input
-                    id="email"
-                    type="email"
+                    id="username"
+                    type="text"
                     name="username"
                     required
-                    autoComplete="email"
+                    autoComplete="username"
                     className="rounded-lg px-3 py-2 bg-[#101012] border border-[#232323] text-white text-sm placeholder:text-[#7dd3fc] focus:outline-none focus:ring-2 focus:ring-cyan-500/60"
-                    placeholder="you@email.com"
+                    placeholder="your_username"
                     value={user.username}
                     onChange={handleChange}
                 />
@@ -130,7 +133,7 @@ export default function LoginForm() {
                         type="button"
                         className="text-cyan-400 hover:underline transition"
                         onClick={() => {
-                            /* handle register navigation */
+                            navigate("/register");
                         }}
                     >
                         Register

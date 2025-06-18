@@ -5,6 +5,7 @@ import { RegisterUserSchema } from "@/zodTypes/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
     const { register, loading, error } = useAuth();
@@ -16,6 +17,8 @@ export default function RegisterForm() {
 
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
+
+    const navigate = useNavigate();
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,7 +40,6 @@ export default function RegisterForm() {
         } else {
             setFormErrors({});
             await register(formData);
-            alert("User registered successfully!");
         }
     };
 
@@ -61,6 +63,26 @@ export default function RegisterForm() {
                 </div>
                 <label
                     className="text-xs text-cyan-200 font-semibold mb-1"
+                    htmlFor="username"
+                >
+                    Username
+                </label>
+                <Input
+                    id="username"
+                    type="text"
+                    name="username"
+                    required
+                    autoComplete="username"
+                    className="rounded-lg px-3 py-2 bg-[#101012] border border-[#232323] text-white text-sm placeholder:text-[#7dd3fc] focus:outline-none focus:ring-2 focus:ring-cyan-500/60"
+                    placeholder="Username"
+                    value={formData.username}
+                    onChange={handleChange}
+                />
+                {formErrors && (
+                    <p className="text-[#ff5555] text-sm text-center">{formErrors.username}</p>
+                )}
+                <label
+                    className="text-xs text-cyan-200 font-semibold mb-1"
                     htmlFor="email"
                 >
                     Email
@@ -68,6 +90,7 @@ export default function RegisterForm() {
                 <Input
                     id="email"
                     type="email"
+                    name="email"
                     required
                     autoComplete="email"
                     className="rounded-lg px-3 py-2 bg-[#101012] border border-[#232323] text-white text-sm placeholder:text-[#7dd3fc] focus:outline-none focus:ring-2 focus:ring-cyan-500/60"
@@ -75,6 +98,9 @@ export default function RegisterForm() {
                     value={formData.email}
                     onChange={handleChange}
                 />
+                {formErrors && (
+                    <p className="text-[#ff5555] text-sm text-center">{formErrors.email}</p>
+                )}
                 <label
                     className="text-xs text-cyan-200 font-semibold mb-1"
                     htmlFor="password"
@@ -85,6 +111,7 @@ export default function RegisterForm() {
                     <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
+                        name="password"
                         required
                         autoComplete="new-password"
                         className="rounded-lg px-3 py-2 bg-[#101012] border border-[#232323] text-white text-sm placeholder:text-[#7dd3fc] focus:outline-none focus:ring-2 focus:ring-cyan-500/60 w-full"
@@ -105,24 +132,11 @@ export default function RegisterForm() {
                         )}
                     </button>
                 </div>
-                <label
-                    className="text-xs text-cyan-200 font-semibold mb-1"
-                    htmlFor="confirm"
-                >
-                    Confirm Password
-                </label>
-                <Input
-                    id="confirm"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    autoComplete="new-password"
-                    className="rounded-lg px-3 py-2 bg-[#101012] border border-[#232323] text-white text-sm placeholder:text-[#7dd3fc] focus:outline-none focus:ring-2 focus:ring-cyan-500/60"
-                    placeholder="Confirm password"
-                    value={formData.password}
-                    onChange={handleChange}
-                />
+                {formErrors && (
+                    <p className="text-[#ff5555] text-sm text-center">{formErrors.password}</p>
+                )}
                 {error && (
-                    <p className="text-[#ff5555] text-sm text-center">{error}</p>
+                    <p className="text-[#fa5252] text-sm text-center">{error}</p>
                 )}
                 <Button
                     type="submit"
@@ -137,7 +151,7 @@ export default function RegisterForm() {
                         type="button"
                         className="text-cyan-400 hover:underline transition"
                         onClick={() => {
-                            /* handle login navigation */
+                            navigate("/login");
                         }}
                     >
                         Already have an account? Login

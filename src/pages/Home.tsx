@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Video, Code, Sparkles, Pencil, LogIn, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   {
@@ -51,6 +52,8 @@ class Pythagoras(Scene):
     setTimeout(() => setCopied(false), 1200);
   };
 
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#232323] to-[#101014] text-white font-sans flex flex-col text-base">
       {/* Header */}
@@ -60,14 +63,14 @@ class Pythagoras(Scene):
           <span className="text-2xl font-bold tracking-tight">Manim AI</span>
         </div>
         <nav className="flex items-center gap-3">
-          <Button variant="ghost" asChild className="px-3 py-2 text-base">
-            <a href="/login" className="flex items-center gap-1"><LogIn className="w-5 h-5" />Login</a>
+          <Button variant="ghost" className="px-3 py-2 text-base" onClick={() => navigate("/login")}>
+            <span className="flex items-center gap-1"><LogIn className="w-5 h-5" />Login</span>
           </Button>
-          <Button variant="ghost" asChild className="px-3 py-2 text-base">
-            <a href="/register" className="flex items-center gap-1"><UserPlus className="w-5 h-5" />Register</a>
+          <Button variant="ghost" className="px-3 py-2 text-base" onClick={() => navigate("/register")}>
+            <span className="flex items-center gap-1"><UserPlus className="w-5 h-5" />Register</span>
           </Button>
-          <Button asChild className="px-5 py-2 text-base font-semibold bg-cyan-600 hover:bg-cyan-500 text-white rounded">
-            <a href="/dashboard">Head Start</a>
+          <Button className="px-5 py-2 text-base font-semibold bg-cyan-600 hover:bg-cyan-500 text-white rounded" onClick={() => navigate("/project")}>
+            Head Start
           </Button>
         </nav>
       </header>
@@ -83,8 +86,8 @@ class Pythagoras(Scene):
         <p className="text-lg md:text-xl text-[#b3b3b3] mb-6 max-w-2xl">
           Describe your idea, let AI generate Manim code, and get instant video output. Edit scenes, tweak code, and bring your math concepts to life.
         </p>
-        <Button size="lg" className="text-lg px-8 py-4 font-semibold bg-cyan-600 hover:bg-cyan-500" asChild>
-          <a href="/register">Get Started Free</a>
+        <Button size="lg" className="text-lg px-8 py-4 font-semibold bg-cyan-600 hover:bg-cyan-500" onClick={() => navigate("/register")}>
+          Get Started Free
         </Button>
       </section>
 
