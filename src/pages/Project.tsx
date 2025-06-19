@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight, Github, Figma } from "lucide-react";
-
+import { useCreateProject } from "@/hooks/useProject";
+import { useProjectStore } from "@/store/states";
 const suggestions = [
 	"Visualize the Pythagorean theorem",
 	"Animate sorting algorithms",
@@ -13,11 +14,23 @@ const suggestions = [
 export default function Project() {
 	const [prompt, setPrompt] = useState("");
 	const navigate = useNavigate();
+	const createMutation  = useCreateProject();
+	const [loading, setLoading] = useState(false);
+	const setCurrentProject = useProjectStore((state)=> state.setCurrentProject)
 
 	// Replace with your actual project creation logic
 	const createProject = async (prompt: string) => {
-		// await api.createProject({ prompt });
-		navigate("/dashboard");
+		try {
+			setLoading(true);
+			const project = await createMutation.mutateAsync({ prompt });
+			setCurrentProject(project)
+			navigate("/dashboard");
+		} catch (error) {
+			console.error("Failed to create project", error);
+			// Optional: show error toast or message
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -75,15 +88,19 @@ export default function Project() {
 						onChange={(e) => setPrompt(e.target.value)}
 						autoFocus
 					/>
-					<Button
-						type="submit"
-						size="sm"
-						className="self-end bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs"
-						disabled={!prompt.trim()}
-					>
-						Start Project{" "}
-						<ArrowRight className="w-4 h-4" />
-					</Button>
+					{loading ? (
+						<Button disabled className="self-end bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs">
+							Creating...</Button>
+						):(<Button
+							type="submit"
+							size="sm"
+							className="self-end bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs"
+							disabled={!prompt.trim()}
+							>
+								Start Project{" "}
+								<ArrowRight className="w-4 h-4" />
+							</Button>
+						)}
 				</form>
 				{/* Suggestions */}
 				<div className="flex flex-wrap gap-2 justify-center mb-5">
@@ -93,7 +110,7 @@ export default function Project() {
 							className="bg-white/10 hover:bg-cyan-500/20 text-white px-3 py-1.5 rounded-full text-xs transition border border-[#232323]"
 							onClick={() => {
 								setPrompt(s);
-								setTimeout(() => createProject(s), 300); // quick UX
+								/*setTimeout(() => createProject(s), 300); // quick UX*/
 							}}
 						>
 							{s}

@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { Plus, Search, Folder } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
+import type { Project } from "@/zodTypes/project";
+import { useNavigate } from "react-router-dom";
+import { useProjectStore } from "@/store/states";
+
 
 export default function ProjectList() {
   const { data: projects = [], isLoading, error } = useProjects();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string | null>(null);
+  const {currentProject, setCurrentProject} = useProjectStore();
 
-  // Group projects by date (assuming each project has a 'createdAt' property)
-  const grouped = projects.reduce((acc: Record<string, typeof projects>, proj: any) => {
-    const date = proj.createdAt
-      ? new Date(proj.createdAt).toDateString()
+  const navigate = useNavigate();
+  // Group projects by date (assuming each project has a 'updated_at' property)
+  const grouped = projects.reduce((acc: Record<string, typeof projects>, proj: Project) => {
+    const date = proj.updated_at
+      ? new Date(proj.updated_at).toDateString()
       : "Unknown";
     acc[date] = acc[date] || [];
     acc[date].push(proj);
@@ -27,7 +32,14 @@ export default function ProjectList() {
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-[#18181b] via-[#15171a] to-[#1a222d] rounded-2xl shadow-xl border border-[#232323]">
       {/* Start new project */}
-      <button className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-medium px-4 py-2 rounded-lg mx-4 mt-2 mb-3 transition shadow">
+      <button className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-medium px-4 py-2 rounded-lg mx-4 mt-2 mb-3 transition shadow"
+              onClick={()=>{
+                const confirmed = window.confirm("Are you sure you want to leave?")
+                if (confirmed){
+                  navigate("/project")
+                }
+              }}
+      >
         <Plus className="w-4 h-4" />
         Start new project
       </button>
@@ -50,17 +62,17 @@ export default function ProjectList() {
           <div key={date}>
             <div className="text-xs text-cyan-200 px-2 py-1">{date}</div>
             {projs
-              .filter((p: any) => p.title.toLowerCase().includes(search.toLowerCase()))
-              .map((proj: any) => (
+              .filter((p: Project) => p.title.toLowerCase().includes(search.toLowerCase()))
+              .map((proj: Project) => (
                 <button
                   key={proj.id}
                   className={`w-full text-left px-3 py-2 rounded-xl mb-1 transition flex items-center gap-2 font-medium
                     ${
-                      selected === proj.id
+                      currentProject?.id === proj.id
                         ? "bg-gradient-to-r from-cyan-600/80 to-blue-600/80 text-white shadow-lg ring-2 ring-cyan-400"
                         : "hover:bg-cyan-900/40 text-cyan-100"
                     }`}
-                  onClick={() => setSelected(proj.id)}
+                  onClick={() => setCurrentProject ? setCurrentProject(proj) : null}
                 >
                   <Folder className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">{proj.title}</span>

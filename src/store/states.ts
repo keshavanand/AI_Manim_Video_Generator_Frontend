@@ -1,6 +1,7 @@
 // Zustand store for managing authentication state (user and token)
 import { create } from 'zustand';
 import type { User_data } from '@/zodTypes/user';
+import type { Project } from '@/zodTypes/project';
 
 // Define the shape of the authentication store
 interface AuthStore {
@@ -13,15 +14,29 @@ interface AuthStore {
 
 // Create the Zustand store for authentication
 export const useAuthStore = create<AuthStore>((set) => ({
-    // Current authenticated user, null if not authenticated
     user: null,
-    // Retrieve token from localStorage if available
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-    // Set the user object
     setUser: (user) => set({ user }),
-    // Set the authentication token
     setToken: (token) => set({ token }),
-    // Clear authentication state (logout)
     clearAuth: () => set({ user: null, token: null }),
 }));
 
+interface ProjectStore {
+    currentProject: Project | null;
+    setCurrentProject: (project: Project) => void;
+}
+
+export const useProjectStore = create<ProjectStore>((set) => ({
+    currentProject: null,
+    setCurrentProject: (project) => set({currentProject:project})
+}))
+
+interface PromptStore{
+    prompt: string | '',
+    setPrompt: (value: string) => void
+}
+
+export const usePromptStore = create<PromptStore>((set)=>({
+    prompt: '',
+    setPrompt: (value: string) => set({prompt:value})
+}))

@@ -5,14 +5,38 @@ import VideoPlayer from "@/components/manimLayout/VideoPlayer";
 import CodeEditor from "@/components/manimLayout/CodeEditor";
 import CodeOutput from "@/components/manimLayout/CodeOutput";
 import ProjectList from "@/components/manimLayout/ProjectList";
-
-const projectName = "Neural Network Animation";
+import { useAuth } from "@/hooks/useAuth";
+import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
+import { useProjectStore } from "@/store/states";
 
 export default function Dashboard() {
   const [showProjectList, setShowProjectList] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState<"scenes" | "preview">("scenes");
+  const {currentProject, setCurrentProject} = useProjectStore();
+  const [ editMode, setEditMode ] = useState(false);
+  const {logout} = useAuth();
+  const  updateMutation = useUpdateProject()
+  const deleteMutation = useDeleteProject()
 
+  // Handle project edit
+  const handleProjectEdit = () => {
+    if (currentProject){
+      updateMutation.mutate({
+        id: currentProject.id,
+        updateData: {
+          title: currentProject.title
+        }
+      })
+    }
+    setEditMode(false)
+  }
+
+  const handleProjectDelete = () => {
+    if (currentProject){
+      deleteMutation.mutate(currentProject.id)
+    }
+  }
   // Dummy code and video
   const code = `from manim import *\n\nclass Scene1(Scene):\n    def construct(self):\n        self.play(Create(Circle()))`;
   const videoSrc = "https://www.w3schools.com/html/mov_bbb.mp4";
@@ -46,10 +70,20 @@ export default function Dashboard() {
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-1 py-1">
-          <ProjectList />
+          <ProjectList/>
         </div>
-        <div className="px-3 py-2 border-t border-[#232323] text-xs text-[#b3b3b3]">
-          © 2025 MAnim
+        <div className="absolute bottom-0 left-0 w-full flex flex-col">
+          <div className="flex justify-end px-3 py-2 border-t border-[#232323]">
+            <button
+              onClick={logout}
+              className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#232323] hover:bg-cyan-700 text-cyan-200 transition text-xs"
+            >
+              <X className="w-4 h-4" /> Logout
+            </button>
+          </div>
+          <div className="px-3 pb-2 text-xs text-[#b3b3b3] text-left">
+            © 2025 MAnim
+          </div>
         </div>
       </div>
 
@@ -61,7 +95,29 @@ export default function Dashboard() {
         </div>
         {/* Center: Project Name + Menu */}
         <div className="flex items-center gap-2">
-          <span className="text-base font-semibold">{projectName}</span>
+          {!editMode ? 
+          <span className="text-base font-semibold">{currentProject?.title}</span> :
+          <input autoFocus className="bg-[#232323] text-cyan-200 px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500/60"
+            type="text"
+            value={currentProject?.title || ""}
+            onChange={(e) => {
+              if (currentProject) {
+                setCurrentProject({
+                  ...currentProject,
+                  title: e.target.value,
+                });
+              }
+            }}
+            onKeyDown={(e)=>{
+              if(e.key === 'Enter'){
+                handleProjectEdit();
+              }
+            }}
+            onBlur={()=>{
+              handleProjectEdit();
+            }}
+            placeholder="Project Title"
+          />}
           <div className="relative">
             <button
               className="p-1.5 rounded hover:bg-[#232323] transition"
@@ -75,7 +131,7 @@ export default function Dashboard() {
                   className="w-full text-left px-3 py-2 hover:bg-[#18181b] transition"
                   onClick={() => {
                     setShowMenu(false);
-                    // handle edit
+                    setEditMode(true);
                   }}
                 >
                   Edit Project
@@ -84,7 +140,7 @@ export default function Dashboard() {
                   className="w-full text-left px-3 py-2 hover:bg-[#18181b] text-red-400 transition"
                   onClick={() => {
                     setShowMenu(false);
-                    // handle delete
+                    handleProjectDelete()
                   }}
                 >
                   Delete Project

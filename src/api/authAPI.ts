@@ -10,7 +10,15 @@ import type { RegisterUser, User_data, LoginUser, Token } from "@/zodTypes/user"
  * @returns The registered user data.
  */
 export async function registerUser(data: RegisterUser): Promise<User_data> {
-    const response = await instance.post<User_data>('auth/register/', data);
+    const response = await instance.post<User_data>(
+        '/auth/register/',
+        data,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    );
     return response.data;
 }
 

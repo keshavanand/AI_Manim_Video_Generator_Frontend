@@ -1,6 +1,6 @@
 // API functions for project-related endpoints: /projects, /scenes, /render, etc.
 
-import { type Project, type Projects, type UpdateProject } from "@/zodTypes/project";
+import { type CreateProject, type Project, type Projects, type UpdateProject } from "@/zodTypes/project";
 import instance from "./axiosInstance";
 
 /**
@@ -8,8 +8,8 @@ import instance from "./axiosInstance";
  * @param project - The project data to create.
  * @returns The ID of the created project.
  */
-export async function createProject(project: Project): Promise<string> {
-    const response = await instance.post<string>("/project/create_project", project);
+export async function createProject(project: CreateProject): Promise<Project> {
+    const response = await instance.post<Project>("/project/create_project", project);
     return response.data;
 }
 

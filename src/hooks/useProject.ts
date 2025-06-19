@@ -5,7 +5,7 @@ import {
   deleteProject,
 } from '@/api/projectAPI';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Project, Projects, UpdateProject as UpdateProjectType } from '@/zodTypes/project';
+import type { CreateProject, Projects, UpdateProject as UpdateProjectType } from '@/zodTypes/project';
 
 /**
  * Custom hook to fetch all projects.
@@ -24,7 +24,7 @@ export const useCreateProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (project: Project) => createProject(project),
+    mutationFn: (project: CreateProject) => createProject(project),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },

@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create an Axios instance with default configuration
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL, // Base URL from environment variable
-    timeout: 1000, // Request timeout in milliseconds
+    //timeout: 1000, // Request timeout in milliseconds
     headers: { 'X-Custom-Header': 'foobar' }, // Example custom header
 });
 

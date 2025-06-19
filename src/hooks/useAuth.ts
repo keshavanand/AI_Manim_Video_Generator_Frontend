@@ -29,7 +29,15 @@ export function useAuth() {
             navigate("/login");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            setError(error.response?.data?.detail || "Registration Failed");
+            // Try to extract detailed error message from backend response
+            const backendDetail = error.response?.data?.detail;
+            if (Array.isArray(backendDetail) && backendDetail.length > 0 && backendDetail[0]?.msg) {
+                setError(backendDetail[0].msg);
+            } else if (typeof backendDetail === "string") {
+                setError(backendDetail);
+            } else {
+                setError("Registration Failed");
+            }
         } finally {
             setLoading(false);
         }
@@ -60,7 +68,8 @@ export function useAuth() {
     const logout = useCallback(() => {
         clearAuth();
         localStorage.removeItem("token");
-    }, [clearAuth]);
+        navigate("/login");
+    }, [clearAuth, navigate]);
 
     /**
      * Load user from token in localStorage.
