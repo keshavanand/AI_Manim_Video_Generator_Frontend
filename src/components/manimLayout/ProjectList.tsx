@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Folder } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
 import type { Project } from "@/zodTypes/project";
@@ -13,14 +13,35 @@ export default function ProjectList() {
 
   const navigate = useNavigate();
   // Group projects by date (assuming each project has a 'updated_at' property)
-  const grouped = projects.reduce((acc: Record<string, typeof projects>, proj: Project) => {
-    const date = proj.updated_at
-      ? new Date(proj.updated_at).toDateString()
-      : "Unknown";
-    acc[date] = acc[date] || [];
-    acc[date].push(proj);
-    return acc;
-  }, {});
+  const grouped = useMemo(()=>{
+      return projects.reduce((acc: Record<string, typeof projects>, proj: Project) => {
+      const date = proj.updated_at
+        ? new Date(proj.updated_at).toDateString()
+        : "Unknown";
+      acc[date] = acc[date] || [];
+      acc[date].push(proj);
+      return acc;
+    }, {});
+  },[projects]) 
+
+  const sortedGrouped = useMemo( () => {
+    return Object.entries(grouped).sort(([a],[b])=>{
+        if (a === 'Unknown') return 1;
+        if (b === 'Unknown') return -1;
+        return new Date(b).getTime() - new Date(a).getTime();
+    })
+  },[grouped]) 
+
+  useEffect(()=>{
+    if(sortedGrouped.length > 0 && sortedGrouped[0][1].length > 0){
+      setCurrentProject(sortedGrouped[0][1][0])
+    }else{
+      if (currentProject !== null) {
+        setCurrentProject(null);
+        navigate("/project");
+      }
+    }
+  },[currentProject, navigate, setCurrentProject, sortedGrouped])
 
   if (isLoading) {
     return <div className="px-4 py-4 text-sm text-cyan-400 animate-pulse">Loading projects...</div>;
@@ -58,7 +79,7 @@ export default function ProjectList() {
       {/* Projects List */}
       <div className="flex-1 overflow-y-auto px-2">
         <div className="text-xs text-cyan-300 font-semibold px-2 py-2 tracking-wide">Your Projects</div>
-        {Object.entries(grouped).map(([date, projs]) => (
+        {sortedGrouped.map(([date, projs]) => (
           <div key={date}>
             <div className="text-xs text-cyan-200 px-2 py-1">{date}</div>
             {projs

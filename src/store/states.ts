@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
 interface ProjectStore {
     currentProject: Project | null;
-    setCurrentProject: (project: Project) => void;
+    setCurrentProject: (project: Project | null) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set) => ({
