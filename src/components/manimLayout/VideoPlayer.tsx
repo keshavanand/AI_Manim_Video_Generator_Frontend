@@ -1,14 +1,58 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play, Pause, Maximize2 } from "lucide-react";
+import type { Scene } from "@/zodTypes/scene";
+import { useSceneVideo } from "@/hooks/useMedia";
 
 interface VideoPlayerProps {
-  src?: string;
-  poster?: string;
+  selectedScene?: Scene
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster }) => {
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({selectedScene}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const {data: videoBlob} = useSceneVideo(selectedScene?.id);
+  const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
+ 
+  useEffect(() => {
+    if (!videoBlob || !videoRef.current) return;
+
+    // Pause and reset video before loading new blob
+    const videoElement = videoRef.current;
+    videoElement.pause();
+    videoElement.currentTime = 0;
+    setIsPlaying(false);
+
+    const url = URL.createObjectURL(videoBlob);
+    setVideoUrl(url);
+    
+    return () => {
+        URL.revokeObjectURL(url); // frees old URL, but blob is still cached
+      };
+    
+  }, [videoBlob]);
+
+  useEffect(() => {
+      const video = videoRef.current;
+      if (!video || !videoUrl) return;
+
+      video.load(); // Load the new source
+
+      const playPromise = video.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((error) => {
+            // AbortError: play was interrupted, or autoplay is blocked
+            console.warn("Video play failed:", error);
+            setIsPlaying(false);
+          });
+      }
+    }, [videoUrl]);
+
 
   const handlePlayPause = () => {
     if (!videoRef.current) return;
@@ -34,8 +78,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster }) => {
       <div className="relative w-full h-full flex-1 rounded-xl overflow-hidden bg-black border border-[#232323]">
         <video
           ref={videoRef}
-          src={src}
-          poster={poster}
+          src={videoUrl}
           className="w-full h-full object-contain bg-black rounded-xl"
           onClick={handlePlayPause}
           onPlay={() => setIsPlaying(true)}

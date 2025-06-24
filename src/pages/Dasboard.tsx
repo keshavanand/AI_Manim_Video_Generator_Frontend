@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MoreVertical, FileVideo, FileCode2, X} from "lucide-react";
 import ChatInterface from "@/components/manimLayout/ChatInterface";
 import VideoPlayer from "@/components/manimLayout/VideoPlayer";
@@ -10,7 +10,6 @@ import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
 import { useProjectStore } from "@/store/states";
 import { useScenes } from "@/hooks/useScene";
 import type { Scene } from "@/zodTypes/scene";
-import { useSceneVideo } from "@/hooks/useMedia";
 
 export default function Dashboard() {
   const [showProjectList, setShowProjectList] = useState(false);
@@ -22,20 +21,6 @@ export default function Dashboard() {
   const deleteMutation = useDeleteProject()
   const {data: scenes=[]} = useScenes(currentProject?.id || "");
   const [selectedScene, setSelectedScene] = useState<Scene>();
-  const {data: videoBlob} = useSceneVideo(selectedScene?.id);
-  const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
- 
-  useEffect(() => {
-    if (!videoBlob) return;
-
-    const url = URL.createObjectURL(videoBlob);
-    setVideoUrl(url);
-    
-    return () => {
-        URL.revokeObjectURL(url); // frees old URL, but blob is still cached
-      };
-    
-  }, [videoBlob]);
 
   // Handle project edit
   const handleProjectEdit = () => {
@@ -192,7 +177,7 @@ export default function Dashboard() {
         <div className="flex flex-col w-[30%] min-w-[300px] h-full">
           {/* Video */}
           <div className="h-[50%] border-b border-[#232323] flex items-center justify-center">
-            <VideoPlayer src={videoUrl} />
+            <VideoPlayer selectedScene={selectedScene} />
           </div>
 
           {/* Output */}
