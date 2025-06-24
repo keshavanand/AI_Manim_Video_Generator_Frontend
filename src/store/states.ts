@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import type { User_data } from '@/zodTypes/user';
 import type { Project } from '@/zodTypes/project';
+import type { Scene } from '@/zodTypes/scene';
 
 // Define the shape of the authentication store
 interface AuthStore {
@@ -39,4 +40,14 @@ interface PromptStore{
 export const usePromptStore = create<PromptStore>((set)=>({
     prompt: '',
     setPrompt: (value: string) => set({prompt:value})
+}))
+
+interface SceneListStore{
+    sceneList: Scene[] | [];
+    setSceneList: (scenes: Scene[]) => void;
+}
+
+export const useSceneListStore = create<SceneListStore>((set)=> ({
+    sceneList: [],
+    setSceneList: (scenes) => set({sceneList:scenes})
 }))

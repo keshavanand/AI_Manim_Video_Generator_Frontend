@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Play, Pause, Maximize2 } from "lucide-react";
 
 interface VideoPlayerProps {
-  src: string;
+  src?: string;
   poster?: string;
 }
 
