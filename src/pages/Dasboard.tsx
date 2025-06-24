@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { MoreVertical, FileVideo, FileCode2, X, Film, Code2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MoreVertical, FileVideo, FileCode2, X} from "lucide-react";
 import ChatInterface from "@/components/manimLayout/ChatInterface";
 import VideoPlayer from "@/components/manimLayout/VideoPlayer";
 import CodeEditor from "@/components/manimLayout/CodeEditor";
@@ -8,16 +8,34 @@ import ProjectList from "@/components/manimLayout/ProjectList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
 import { useProjectStore } from "@/store/states";
+import { useScenes } from "@/hooks/useScene";
+import type { Scene } from "@/zodTypes/scene";
+import { useSceneVideo } from "@/hooks/useMedia";
 
 export default function Dashboard() {
   const [showProjectList, setShowProjectList] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [activeTab, setActiveTab] = useState<"scenes" | "preview">("scenes");
   const {currentProject, setCurrentProject} = useProjectStore();
   const [ editMode, setEditMode ] = useState(false);
   const {logout} = useAuth();
   const  updateMutation = useUpdateProject()
   const deleteMutation = useDeleteProject()
+  const {data: scenes=[]} = useScenes(currentProject?.id || "");
+  const [selectedScene, setSelectedScene] = useState<Scene>();
+  const {data: videoBlob} = useSceneVideo(selectedScene?.id);
+  const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
+ 
+  useEffect(() => {
+    if (!videoBlob) return;
+
+    const url = URL.createObjectURL(videoBlob);
+    setVideoUrl(url);
+    
+    return () => {
+        URL.revokeObjectURL(url); // frees old URL, but blob is still cached
+      };
+    
+  }, [videoBlob]);
 
   // Handle project edit
   const handleProjectEdit = () => {
@@ -37,10 +55,6 @@ export default function Dashboard() {
       deleteMutation.mutate(currentProject.id)
     }
   }
-  // Dummy code and video
-  const code = `from manim import *\n\nclass Scene1(Scene):\n    def construct(self):\n        self.play(Create(Circle()))`;
-  const videoSrc = "https://www.w3schools.com/html/mov_bbb.mp4";
-
   // Show project list when hovering near left edge
   const handleMouseMove = (e: React.MouseEvent) => {
     if (e.clientX < 32) setShowProjectList(true);
@@ -168,61 +182,25 @@ export default function Dashboard() {
             <ChatInterface />
           </div>
         </section>
+      <aside className="flex-1 bg-[#18181b] flex h-full overflow-hidden">
+        {/* Left: Code Editor */}
+        <div className="flex w-[70%] min-w-[300px] h-full border-r border-[#232323]">
+          <CodeEditor scenes={scenes} selectedScene={selectedScene} setSelectedScene={(scene)=> setSelectedScene(scene)} />
+        </div>
 
-        {/* Right Panel: Tabs (no gap, fills remaining space) */}
-        <aside className="flex-1 bg-[#18181b] flex flex-col h-full">
-          {/* Tabs */}
-          <div className="flex items-center border-b border-[#232323] bg-[#15171a]">
-            <button
-              className={`flex-1 py-2 text-center flex items-center justify-center gap-2 font-semibold text-base transition rounded-t-xl
-                ${
-                  activeTab === "scenes"
-                    ? "bg-[#232323] text-cyan-200 shadow"
-                    : "hover:bg-cyan-900/30 text-cyan-100"
-                }`}
-              onClick={() => setActiveTab("scenes")}
-            >
-              <Code2 className="w-4 h-4" />
-              Scenes
-            </button>
-            <button
-              className={`flex-1 py-2 text-center flex items-center justify-center gap-2 font-semibold text-base transition rounded-t-xl
-                ${
-                  activeTab === "preview"
-                    ? "bg-[#232323] text-cyan-200 shadow"
-                    : "hover:bg-cyan-900/30 text-cyan-100"
-                }`}
-              onClick={() => setActiveTab("preview")}
-            >
-              <Film className="w-4 h-4" />
-              Preview
-            </button>
+        {/* Right: Video on top, Output below */}
+        <div className="flex flex-col w-[30%] min-w-[300px] h-full">
+          {/* Video */}
+          <div className="h-[50%] border-b border-[#232323] flex items-center justify-center">
+            <VideoPlayer src={videoUrl} />
           </div>
-          {/* Tab Content */}
-          <div className="flex-1 flex flex-col h-full w-full">
-            {activeTab === "preview" && (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="w-full flex justify-center items-center h-full">
-                  <div className="w-full max-w-[520px] min-w-[320px] h-[60%] flex items-center justify-center">
-                    <VideoPlayer src={videoSrc} />
-                  </div>
-                </div>
-              </div>
-            )}
-            {activeTab === "scenes" && (
-              <div className="flex flex-col h-full w-full">
-                <div className="flex-grow" style={{ flexBasis: "70%", minHeight: 0 }}>
-                  <CodeEditor value={code} onChange={() => {}} />
-                </div>
-                <div className="flex-grow" style={{ flexBasis: "30%", minHeight: 0 }}>
-                  <div className="h-full w-full">
-                    <CodeOutput code={code} language="python" />
-                  </div>
-                </div>
-              </div>
-            )}
+
+          {/* Output */}
+          <div className="h-[50%]">
+            <CodeOutput selectedScene={selectedScene} />
           </div>
-        </aside>
+        </div>
+      </aside>
       </div>
     </div>
   );
