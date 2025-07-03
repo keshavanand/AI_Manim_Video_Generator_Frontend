@@ -34,6 +34,7 @@ export const UpdateProjectSchema = z.strictObject({
 });
 
 export const CreateProjectSchema = z.strictObject({
+    id: z.string().optional(),
     prompt: z.string()
 })
 // Type definitions inferred from schemas

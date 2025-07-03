@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles } from "lucide-react";
+import { useProjectStore } from "@/store/states";
+import { useCreateProject } from "@/hooks/useProject";
 
 export default function ChatInterface() {
+  const {currentProject} = useProjectStore();
+  const createMutation  = useCreateProject();
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you today?", from: "bot" },
     { text: "Can you explain how this chat works?", from: "user" },
@@ -19,6 +23,10 @@ export default function ChatInterface() {
     if (!input.trim()) return;
     const userMessage = { text: input, from: "user" as const };
     setMessages((msgs) => [...msgs, userMessage]);
+    await createMutation.mutateAsync({
+      id: currentProject?.id,
+      prompt: input,
+    })
     setInput("");
     setIsLoading(true);
 
