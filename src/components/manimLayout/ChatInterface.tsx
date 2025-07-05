@@ -2,47 +2,68 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles } from "lucide-react";
 import { useProjectStore } from "@/store/states";
 import { useCreateProject } from "@/hooks/useProject";
+import { useChat } from "@/hooks/useChat";
 
 export default function ChatInterface() {
-  const {currentProject} = useProjectStore();
-  const createMutation  = useCreateProject();
-  const [messages, setMessages] = useState([
-    { text: "Hello! How can I help you today?", from: "bot" },
-    { text: "Can you explain how this chat works?", from: "user" },
-  ]);
+  const { currentProject } = useProjectStore();
+  const createMutation = useCreateProject();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Local messages state is synced with chatHistory
+  const { data: chatHistory, refetch } = useChat(currentProject?.id || "");
+  const [messages, setMessages] = useState([
+    { text: "Hello! How can I help you today?", from: "bot" },
+  ]);
+
+  // Sync messages with chatHistory from backend
+  useEffect(() => {
+    if (chatHistory && Array.isArray(chatHistory)) {
+      try {
+        setMessages(
+          chatHistory.map((msg) => ({
+            text: msg.content,
+            from: msg.role === "user" ? "user" : "bot",
+          }))
+        );
+      } catch (error) {
+        console.error("Error parsing chat history:", error);
+        setMessages([]);
+      }
+    }
+  }, [chatHistory]);
+
+  // Scroll to bottom on messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Handle user input submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-    const userMessage = { text: input, from: "user" as const };
-    setMessages((msgs) => [...msgs, userMessage]);
-    await createMutation.mutateAsync({
-      id: currentProject?.id,
-      prompt: input,
-    })
-    setInput("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages((msgs) => [
-        ...msgs,
-        {
-          text:
-            "This is an AI-generated response to your prompt: " +
-            userMessage.text,
-          from: "bot" as const,
-        },
-      ]);
+    // Optimistically add user message
+    setMessages((prev) => [
+      ...prev,
+      { text: input, from: "user" }
+    ]);
+
+    try {
+      await createMutation.mutateAsync({
+        id: currentProject?.id,
+        prompt: input,
+      });
+      setInput("");
+      // Refetch chat history to get latest messages from backend
+      await refetch();
+    } catch (error) {
+      console.log("Error:error", error);
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   return (
