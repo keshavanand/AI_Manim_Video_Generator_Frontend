@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FileText, Check, Copy } from "lucide-react";
 import {type Scene } from "@/zodTypes/scene";
+import Editor from '@monaco-editor/react';
 
 interface CodeEditorProps {
   scenes: Scene[];
@@ -25,7 +26,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           setTimeout(() => setCopied(false), 1200);
         };
 
+        const onChangeCode = (value: string| undefined)=>{
+            if (!selectedScene) return;
 
+                setSelectedScene({
+                  ...selectedScene,
+                  scene_code: value,
+                });
+            }
         return (
           <div
             className={`flex w-full h-full bg-gradient-to-br from-[#18181b] via-[#15171a] to-[#1a222d] rounded-2xl shadow-xl border border-[#232323] overflow-hidden ${className}`}
@@ -73,20 +81,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                   {copied ? "Copied" : "Copy"}
                 </button>
               </div>
-              <textarea
+              <Editor
+                theme="vs-dark"
+                defaultLanguage="python"
+                defaultValue="#Manim Code"
                 value={selectedScene?.scene_code}
-                onChange={(e) => {
-                  if (!selectedScene) return;
-
-                  setSelectedScene({
-                    ...selectedScene,
-                    scene_code: e.target.value,
-                  });
-                }}
-                placeholder={placeholder}
+                onChange={onChangeCode}
                 className="flex-1 w-full resize-none bg-[#101012] text-white placeholder:text-[#888] border-none outline-none p-4 text-sm font-mono rounded-b-2xl focus:ring-2 focus:ring-cyan-500/60 transition"
-                spellCheck={false}
-                autoComplete="off"
               />
             </div>
           </div>

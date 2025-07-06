@@ -6,7 +6,7 @@ import {z} from "zod"
 export const SceneSchema = z.strictObject({
     id: z.string(),             
     scene_name: z.string(),
-    scene_code: z.string(),
+    scene_code: z.string().optional(),
     scene_output: z.string(),
     created_at: z.string().datetime(),
     updated_at: z.string().datetime(),     
