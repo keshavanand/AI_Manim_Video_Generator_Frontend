@@ -41,7 +41,7 @@ export default function ProjectList() {
         navigate("/project");
       }
     }
-  },[currentProject, navigate, setCurrentProject, sortedGrouped])
+  },[projects,navigate, sortedGrouped])
 
   if (isLoading) {
     return <div className="px-4 py-4 text-sm text-cyan-400 animate-pulse">Loading projects...</div>;
@@ -49,6 +49,10 @@ export default function ProjectList() {
   if (error) {
     return <div className="px-4 py-4 text-sm text-red-400">Failed to load projects.</div>;
   }
+
+  const handleProjectClick = (proj: Project) => {
+      setCurrentProject(proj);
+  };
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-[#18181b] via-[#15171a] to-[#1a222d] rounded-2xl shadow-xl border border-[#232323]">
@@ -93,7 +97,7 @@ export default function ProjectList() {
                         ? "bg-gradient-to-r from-cyan-600/80 to-blue-600/80 text-white shadow-lg ring-2 ring-cyan-400"
                         : "hover:bg-cyan-900/40 text-cyan-100"
                     }`}
-                  onClick={() => setCurrentProject ? setCurrentProject(proj) : null}
+                  onClick={() => handleProjectClick(proj)}
                 >
                   <Folder className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">{proj.title}</span>
