@@ -9,7 +9,12 @@ import instance from "./axiosInstance";
  * @returns The ID of the created project.
  */
 export async function createProject(project: CreateProject): Promise<Project> {
-    const response = await instance.post<Project>("/project/create_new_Project", project);
+    const response = await instance.post<Project>("/project/create_project", project);
+    return response.data;
+}
+
+export async function editProject(project: CreateProject): Promise<Project> {
+    const response = await instance.post<Project>("/project/edit_project", project);
     return response.data;
 }
 

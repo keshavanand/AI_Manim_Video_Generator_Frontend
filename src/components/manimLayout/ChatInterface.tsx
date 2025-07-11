@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles } from "lucide-react";
 import { useProjectStore } from "@/store/states";
-import { useCreateProject } from "@/hooks/useProject";
+import { useEditProject } from "@/hooks/useProject";
 import { useChat } from "@/hooks/useChat";
 
 export default function ChatInterface() {
   const { currentProject } = useProjectStore();
-  const createMutation = useCreateProject();
+  const createMutation = useEditProject();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -81,13 +81,13 @@ export default function ChatInterface() {
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center font-bold text-white shadow">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <div className="bg-cyan-900/60 text-cyan-100 px-4 py-3 rounded-2xl rounded-bl-none max-w-xl shadow border border-cyan-800/40 backdrop-blur">
+              <div className="bg-cyan-900/60 text-cyan-100 px-4 py-3 rounded-2xl rounded-bl-none max-w-xl w-full sm:w-fit shadow border border-cyan-800/40 backdrop-blur break-words overflow-hidden">
                 {msg.text}
               </div>
             </div>
           ) : (
             <div className="flex justify-end" key={idx}>
-              <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-3 rounded-2xl rounded-br-none max-w-xl shadow border border-cyan-400/40">
+              <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-3 rounded-2xl rounded-br-none max-w-xl w-full sm:w-fit shadow border border-cyan-400/40 break-words overflow-hidden">
                 {msg.text}
               </div>
             </div>

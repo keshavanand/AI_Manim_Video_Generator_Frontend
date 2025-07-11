@@ -3,6 +3,7 @@ import {
   getProjects,
   updateProject,
   deleteProject,
+  editProject,
 } from '@/api/projectAPI';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CreateProject, Projects, UpdateProject as UpdateProjectType } from '@/zodTypes/project';
@@ -25,6 +26,21 @@ export const useCreateProject = () => {
 
   return useMutation({
     mutationFn: (project: CreateProject) => createProject(project),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+};
+
+/**
+ * Custom hook to create a new project.
+ * Invalidates 'projects' query on success to refetch updated data.
+ */
+export const useEditProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (project: CreateProject) => editProject(project),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },
