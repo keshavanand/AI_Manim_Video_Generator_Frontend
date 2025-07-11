@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { FileText, Check, Copy } from "lucide-react";
+import { useCallback, useState } from "react";
+import { FileText, Check, Copy, Play } from "lucide-react";
 import {type Scene } from "@/zodTypes/scene";
 import Editor from '@monaco-editor/react';
+import { useRunScene, useUpdateScene } from "@/hooks/useScene";
+import debounce from "lodash.debounce";
 
 interface CodeEditorProps {
   scenes: Scene[];
@@ -19,21 +21,42 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   className = "",
 }) => {
         const [copied, setCopied] = useState(false);
-
+        const updatedSceneMutation = useUpdateScene();
+        const runSceneMutation = useRunScene();
         const handleCopy = () => {
           navigator.clipboard.writeText(selectedScene?.scene_code || placeholder);
           setCopied(true);
           setTimeout(() => setCopied(false), 1200);
         };
 
+        
+        const handleRun = () => {
+          if (selectedScene) {
+            runSceneMutation.mutate(selectedScene.id);
+          }
+        };
+
+        const updateSceneOnBackend = async(scene: Scene) =>{
+          updatedSceneMutation.mutate({
+            id: scene.id,
+            updateData: scene
+          })
+        }
+
+        const debouncedUpdate = useCallback(
+          debounce((scene:Scene)=>{
+            updateSceneOnBackend(scene);
+          },1000),
+          []
+        );
+
         const onChangeCode = (value: string| undefined)=>{
             if (!selectedScene) return;
+            const updatedScene = { ...selectedScene, scene_code: value };
+            setSelectedScene(updatedScene)
+            debouncedUpdate(updatedScene)
+          }
 
-                setSelectedScene({
-                  ...selectedScene,
-                  scene_code: value,
-                });
-            }
         return (
           <div
             className={`flex w-full h-full bg-gradient-to-br from-[#18181b] via-[#15171a] to-[#1a222d] rounded-2xl shadow-xl border border-[#232323] overflow-hidden ${className}`}
@@ -79,6 +102,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                     <Copy className="w-4 h-4" />
                   )}
                   {copied ? "Copied" : "Copy"}
+                </button>
+                <button
+                  className="flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/80 hover:bg-cyan-400/90 text-white text-xs font-semibold transition"
+                  onClick={handleRun}
+                  type="button"
+                >
+                  <Play className="w-4 h-4"/>
                 </button>
               </div>
               <Editor

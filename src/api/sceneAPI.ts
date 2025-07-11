@@ -1,4 +1,4 @@
-import type { CreateScene, Scene } from "@/zodTypes/scene";
+import type { CreateScene, Scene, UpdateScene } from "@/zodTypes/scene";
 import instance from "./axiosInstance";
 
 /**
@@ -22,4 +22,14 @@ export async function getScenes(project_id: string): Promise<Scene[]> {
 export async function createScene(project: CreateScene): Promise<Scene> {
     const response = await instance.post<Scene>("/project/create_project", project);
     return response.data;
+}
+
+export async function updateScene(id: string, updateData: UpdateScene): Promise<Scene> {
+    const response = await instance.put<Scene>(`/scene/update_scene/${id}`, updateData);
+    return response.data;
+}
+
+export async function runScene(id: string) {
+    const response = await instance.post(`/scene/run_scene/${id}`);
+    return response.data
 }

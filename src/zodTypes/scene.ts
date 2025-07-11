@@ -12,6 +12,12 @@ export const SceneSchema = z.strictObject({
     updated_at: z.string().datetime(),     
 });
 
+export const UpdateSceneSchema = z.strictObject({
+    id: z.string(),
+    scene_name: z.string().optional(),
+    scene_code: z.string().optional(),
+})
+
 export const CreateSceneSchema = z.strictObject({
     project_id: z.string(),
     scene_prompt: z.string()
@@ -19,3 +25,4 @@ export const CreateSceneSchema = z.strictObject({
 
 export type Scene = z.infer<typeof SceneSchema>;
 export type CreateScene = z.infer<typeof CreateSceneSchema>;
+export type UpdateScene = z.infer<typeof UpdateSceneSchema>;
