@@ -1,8 +1,10 @@
 import { useAuthStore } from "@/store/states";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+
 
 function isTokenExpired(token?: string): boolean {
     if (!token) return true;
@@ -26,65 +28,49 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const navigate = useNavigate();
     const {refresh_t} = useAuth()
 
-    if (token && alpha_token && isTokenExpired(token)){
-         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18181b] via-[#232323] to-[#101014]">
-                <Card className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm">
-                    <CardContent className="flex flex-col items-center py-6 px-4">
-                        <h2 className="text-white text-lg font-semibold mb-3">Session Expired</h2>
-                        <p className="text-[#a1a1aa] mb-5 text-center text-sm">
-                            Click the button below to remain active
-                        </p>
-                        <Button
-                            className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded text-sm transition"
-                            onClick={refresh_t}
-                        >
-                            Remain Active
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    } else if (token && !isTokenExpired(token)){
-        return <>{children}</>;
-    } else if (!token || !alpha_token){
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18181b] via-[#232323] to-[#101014]">
-                <Card className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm">
-                    <CardContent className="flex flex-col items-center py-6 px-4">
-                        <h2 className="text-white text-lg font-semibold mb-3">Authentication Required</h2>
-                        <p className="text-[#a1a1aa] mb-5 text-center text-sm">
-                            Please log in to access this page.
-                        </p>
-                        <Button
-                            className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded text-sm transition"
-                            onClick={() => navigate("/login")}
-                        >
-                            Go to Login
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }else {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#18181b] via-[#232323] to-[#101014]">
-                <Card className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm">
-                    <CardContent className="flex flex-col items-center py-6 px-4">
-                        <h2 className="text-white text-lg font-semibold mb-3">Authentication Required</h2>
-                        <p className="text-[#a1a1aa] mb-5 text-center text-sm">
-                            Please log in to access this page.
-                        </p>
-                        <Button
-                            className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded text-sm transition"
-                            onClick={() => navigate("/login")}
-                        >
-                            Go to Login
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
+    const showSessionExpiredDialog = !!(token && alpha_token && isTokenExpired(token));
+    const showLoginRequiredDialog = !!(!token || !alpha_token);
 
+    return (
+        <>
+        {/* Always render the children */}
+        {children}
+
+        {/* Session Expired Dialog */}
+        <Dialog open={showSessionExpiredDialog}>
+            <DialogContent className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm backdrop-blur-sm">
+            <CardContent className="flex flex-col items-center py-6 px-4">
+                <h2 className="text-white text-lg font-semibold mb-3">Session Expired</h2>
+                <p className="text-[#a1a1aa] mb-5 text-center text-sm">
+                Click the button below to remain active
+                </p>
+                <Button
+                className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded text-sm transition"
+                onClick={refresh_t}
+                >
+                Remain Active
+                </Button>
+            </CardContent>
+            </DialogContent>
+        </Dialog>
+
+        {/* Login Required Dialog */}
+        <Dialog open={showLoginRequiredDialog}>
+            <DialogContent className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm backdrop-blur-sm">
+            <CardContent className="flex flex-col items-center py-6 px-4">
+                <h2 className="text-white text-lg font-semibold mb-3">Authentication Required</h2>
+                <p className="text-[#a1a1aa] mb-5 text-center text-sm">
+                Please log in to access this page.
+                </p>
+                <Button
+                className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded text-sm transition"
+                onClick={() => navigate("/login")}
+                >
+                Go to Login
+                </Button>
+            </CardContent>
+            </DialogContent>
+        </Dialog>
+        </>
+    );
 }
