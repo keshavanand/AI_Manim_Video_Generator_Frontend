@@ -27,12 +27,12 @@ export async function registerUser(data: RegisterUser): Promise<User_data> {
  * @param data - Login credentials.
  * @returns The authentication token.
  */
-export async function loginUser(data: LoginUser): Promise<Token> {
+export async function loginUser(data: LoginUser): Promise<Token[]> {
     const formData = new URLSearchParams();
     formData.append('username', data.username);
     formData.append('password', data.password);
 
-    const response = await instance.post<Token>(
+    const response = await instance.post<Token[]>(
         '/auth/token',
         formData,
         {
@@ -59,4 +59,16 @@ export async function getUser(token: string): Promise<User_data> {
         }
     );
     return response.data;
+}
+
+export async function refresh_token(alpha_token:string): Promise<Token>{
+    const response = await instance.get<Token>(
+        'auth/regenerate_token/',{
+            headers:{
+                'alpha-token': alpha_token,
+            },
+        }
+    );
+
+    return response.data
 }

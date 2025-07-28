@@ -1,4 +1,4 @@
-import { getUser, loginUser, registerUser } from "@/api/authAPI";
+import { getUser, loginUser, refresh_token, registerUser } from "@/api/authAPI";
 import { useAuthStore } from "@/store/states";
 import type { LoginUser, RegisterUser } from "@/zodTypes/user";
 import { useState, useEffect, useCallback } from "react";
@@ -11,7 +11,7 @@ export function useAuth() {
     const navigate = useNavigate();
 
     // Auth state and actions from store
-    const { user, token, setToken, setUser, clearAuth } = useAuthStore();
+    const { user, token,alpha_token, setToken, setAlphaToken, setUser, clearAuth } = useAuthStore();
 
     // Local state for loading and error
     const [loading, setLoading] = useState(false);
@@ -51,8 +51,8 @@ export function useAuth() {
         setLoading(true);
         try {
             const res = await loginUser(data);
-            setToken(res.access_token);
-            localStorage.setItem("token", res.access_token);
+            setToken(res[0].access_token);
+            setAlphaToken(res[1].access_token)
             navigate("/dashboard");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -60,22 +60,21 @@ export function useAuth() {
         } finally {
             setLoading(false);
         }
-    }, [navigate, setToken]);
+    }, [navigate, setAlphaToken, setToken]);
 
     /**
      * Logout user and clear auth state.
      */
     const logout = useCallback(() => {
         clearAuth();
-        localStorage.removeItem("token");
         navigate("/login");
     }, [clearAuth, navigate]);
 
     /**
-     * Load user from token in localStorage.
+     * Load user from token in authstore.
      */
     const loadUser = useCallback(async () => {
-        const storedToken = localStorage.getItem("token");
+        const storedToken = token
         if (!storedToken) return;
 
         try {
@@ -85,13 +84,25 @@ export function useAuth() {
         } catch {
             logout();
         }
-    }, [setToken, setUser, logout]);
+    }, [token, setToken, setUser, logout]);
 
     // Load user on mount if not present
     useEffect(() => {
         if (!user) loadUser();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, loadUser]);
+
+    const refresh_t = useCallback(async ()=>{
+        if (!alpha_token) return;
+
+        try{
+            const res = await refresh_token(alpha_token);
+            setToken(res.access_token)
+            navigate("/dashboard") 
+        }catch{
+            navigate("/login")
+        }
+    },[alpha_token, navigate, setToken])
 
     return {
         user,
@@ -101,5 +112,6 @@ export function useAuth() {
         loading,
         error,
         register,
+        refresh_t
     };
 }

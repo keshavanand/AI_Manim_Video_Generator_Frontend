@@ -3,24 +3,44 @@ import { create } from 'zustand';
 import type { User_data } from '@/zodTypes/user';
 import type { Project } from '@/zodTypes/project';
 import type { Scene } from '@/zodTypes/scene';
+import { persist } from 'zustand/middleware';
 
 // Define the shape of the authentication store
 interface AuthStore {
     user: User_data | null;
     token: string | null;
+    alpha_token: string | null;
     setUser: (user: User_data) => void;
     setToken: (token: string) => void;
+    setAlphaToken: (alpha_token: string | null) => void;
     clearAuth: () => void;
+    getAuthState: ()=> { token: string | null; alpha_token: string | null }; 
 }
 
 // Create the Zustand store for authentication
-export const useAuthStore = create<AuthStore>((set) => ({
-    user: null,
-    token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-    setUser: (user) => set({ user }),
-    setToken: (token) => set({ token }),
-    clearAuth: () => set({ user: null, token: null }),
-}));
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      token: null,
+      alpha_token: null,
+
+      setUser: (user) => set({ user }),
+      setToken: (token) => set({ token }),
+      setAlphaToken: (alpha_token) => set({ alpha_token }),
+      clearAuth: () => set({ user: null, token: null, alpha_token: null }),
+
+      getAuthState: () => {
+        const { token, alpha_token } = get();
+        return { token, alpha_token };
+      },
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+);
+
 
 interface ProjectStore {
     currentProject: Project | null;
@@ -51,3 +71,4 @@ export const useSceneListStore = create<SceneListStore>((set)=> ({
     sceneList: [],
     setSceneList: (scenes) => set({sceneList:scenes})
 }))
+
