@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/store/states";
+import { useAuthStore, useGlobalAuthCheck } from "@/store/states";
 import { CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { token, alpha_token } = useAuthStore();
     const navigate = useNavigate();
     const {refresh_t} = useAuth()
+    const {isTokExpired} = useGlobalAuthCheck()
 
     const showSessionExpiredDialog = !!(token && alpha_token && isTokenExpired(token));
     const showLoginRequiredDialog = !!(!token || !alpha_token);
@@ -37,7 +38,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         {children}
 
         {/* Session Expired Dialog */}
-        <Dialog open={showSessionExpiredDialog}>
+        <Dialog open={showSessionExpiredDialog || isTokExpired}>
             <DialogContent className="bg-[#18181b] border border-[#232323] shadow-xl w-full max-w-sm backdrop-blur-sm">
             <CardContent className="flex flex-col items-center py-6 px-4">
                 <h2 className="text-white text-lg font-semibold mb-3">Session Expired</h2>

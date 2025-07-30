@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/states';
+import { useAuthStore, useGlobalAuthCheck } from '@/store/states';
 import axios from 'axios';
 
 // Create an Axios instance with default configuration
@@ -28,5 +28,16 @@ instance.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            const detail = error.response.data?.detail;
+            if (detail === 'expired') useGlobalAuthCheck.getState().setIsTokExpired(true);
+            }
+            return Promise.reject(error);
+    }
+)
 
 export default instance;

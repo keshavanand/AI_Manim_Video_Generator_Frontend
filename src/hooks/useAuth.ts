@@ -1,5 +1,5 @@
 import { getUser, loginUser, refresh_token, registerUser } from "@/api/authAPI";
-import { useAuthStore } from "@/store/states";
+import { useAuthStore, useGlobalAuthCheck } from "@/store/states";
 import type { LoginUser, RegisterUser } from "@/zodTypes/user";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ export function useAuth() {
 
     // Auth state and actions from store
     const { user, token,alpha_token, setToken, setAlphaToken, setUser, clearAuth } = useAuthStore();
-
+    const {setIsTokExpired} = useGlobalAuthCheck()
     // Local state for loading and error
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -53,6 +53,7 @@ export function useAuth() {
             const res = await loginUser(data);
             setToken(res[0].access_token);
             setAlphaToken(res[1].access_token)
+            setIsTokExpired(false)
             navigate("/dashboard");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -60,7 +61,7 @@ export function useAuth() {
         } finally {
             setLoading(false);
         }
-    }, [navigate, setAlphaToken, setToken]);
+    }, [navigate, setAlphaToken, setIsTokExpired, setToken]);
 
     /**
      * Logout user and clear auth state.
@@ -98,11 +99,12 @@ export function useAuth() {
         try{
             const res = await refresh_token(alpha_token);
             setToken(res.access_token)
+            setIsTokExpired(false)
             navigate("/dashboard") 
         }catch{
             navigate("/login")
         }
-    },[alpha_token, navigate, setToken])
+    },[alpha_token, navigate, setIsTokExpired, setToken])
 
     return {
         user,

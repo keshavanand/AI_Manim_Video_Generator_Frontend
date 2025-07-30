@@ -72,3 +72,13 @@ export const useSceneListStore = create<SceneListStore>((set)=> ({
     setSceneList: (scenes) => set({sceneList:scenes})
 }))
 
+
+interface globalAuthCheck{
+  isTokExpired: boolean | false;
+  setIsTokExpired: (value: boolean)=> void
+}
+
+export const useGlobalAuthCheck = create<globalAuthCheck>((set)=>({
+  isTokExpired: false,
+  setIsTokExpired: (value: boolean)=> set({isTokExpired:value})
+}))
