@@ -23,7 +23,8 @@ export default function Project() {
 		try {
 			setLoading(true);
 			const project = await createMutation.mutateAsync({ prompt });
-			setCurrentProject(project)
+			console.log(project)
+			setCurrentProject({...project})
 			navigate("/dashboard");
 		} catch (error) {
 			console.error("Failed to create project", error);

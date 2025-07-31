@@ -12,9 +12,8 @@ const instance = axios.create({
 // Add a request interceptor to include Authorization header if token exists
 instance.interceptors.request.use(
     (config) => {
-        const { token, alpha_token } = useAuthStore.getState(); // ✅ Correct usage
-        // const token = localStorage.getItem("token")
-        // const alpha_token = localStorage.getItem("alpha_token")
+        const { token, alpha_token } = useAuthStore.getState(); 
+
         if (token) {
             // Ensure headers object exists
             config.headers = config.headers ?? {};
@@ -29,6 +28,7 @@ instance.interceptors.request.use(
     }
 );
 
+// Handle logic to display remain active dialog to user if token expired
 instance.interceptors.response.use(
     (response) => response,
     (error) => {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Search, Folder } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
 import type { Project } from "@/zodTypes/project";
@@ -32,16 +32,26 @@ export default function ProjectList() {
     })
   },[grouped]) 
 
+  const redirectedRef = useRef(false);
+
+
   useEffect(()=>{
-    if(sortedGrouped.length > 0 && sortedGrouped[0][1].length > 0){
+    const currentExists = projects.some((p) => p.id === currentProject?.id);
+
+    if((!currentProject || !currentExists) && projects.length > 0){
       setCurrentProject(sortedGrouped[0][1][0])
-    }else{
-      if (currentProject !== null) {
-        setCurrentProject(null);
-        navigate("/project");
-      }
+    }if (!isLoading && projects.length === 0 && !redirectedRef.current) {
+        const timeout = setTimeout(() => {
+        if (projects.length === 0) {
+          redirectedRef.current = true;
+          setCurrentProject(null);
+          navigate("/project");
+        }
+      }, 300); // 300ms delay to allow re-fetching
+
+      return () => clearTimeout(timeout);
     }
-  },[projects,navigate, sortedGrouped])
+  },[projects, navigate, sortedGrouped, setCurrentProject, currentProject, isLoading])
 
   if (isLoading) {
     return <div className="px-4 py-4 text-sm text-cyan-400 animate-pulse">Loading projects...</div>;
@@ -51,7 +61,9 @@ export default function ProjectList() {
   }
 
   const handleProjectClick = (proj: Project) => {
-      setCurrentProject(proj);
+    if(proj.id !== currentProject?.id){
+      setCurrentProject({...proj});
+    }
   };
 
   return (

@@ -47,11 +47,17 @@ interface ProjectStore {
     setCurrentProject: (project: Project | null) => void;
 }
 
-export const useProjectStore = create<ProjectStore>((set) => ({
-    currentProject: null,
-    setCurrentProject: (project) => set({currentProject:project})
-}))
-
+export const useProjectStore = create<ProjectStore>()(
+  persist(
+    (set) => ({
+      currentProject: null,
+      setCurrentProject: (project) => set({ currentProject: project }),
+    }),
+    {
+      name: 'project-storage', // localStorage key
+    }
+  )
+);
 interface PromptStore{
     prompt: string | '',
     setPrompt: (value: string) => void
