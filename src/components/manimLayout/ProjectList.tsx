@@ -38,19 +38,21 @@ export default function ProjectList() {
   useEffect(()=>{
     const currentExists = projects.some((p) => p.id === currentProject?.id);
 
-    if((!currentProject || !currentExists) && projects.length > 0){
-      setCurrentProject(sortedGrouped[0][1][0])
-    }if (!isLoading && projects.length === 0 && !redirectedRef.current) {
-        const timeout = setTimeout(() => {
-        if (projects.length === 0) {
-          redirectedRef.current = true;
-          setCurrentProject(null);
-          navigate("/project");
-        }
-      }, 300); // 300ms delay to allow re-fetching
+    const timeout = setTimeout(() => {
+      
+      if((!currentProject || !currentExists) && projects.length > 0){
+          setCurrentProject(sortedGrouped[0][1][0])
+      }
+        
+      if (!isLoading && projects.length === 0 && !redirectedRef.current) {
+        redirectedRef.current = true;
+        setCurrentProject(null);
+        navigate("/project");
+      }
+    }, 300); // 300ms delay to allow re-fetching
 
-      return () => clearTimeout(timeout);
-    }
+    return () => clearTimeout(timeout);
+    
   },[projects, navigate, sortedGrouped, setCurrentProject, currentProject, isLoading])
 
   if (isLoading) {
