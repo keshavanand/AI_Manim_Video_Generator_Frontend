@@ -7,6 +7,7 @@ import {
 } from '@/api/projectAPI';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CreateProject, Projects, UpdateProject as UpdateProjectType } from '@/zodTypes/project';
+import { useSceneStore } from '@/store/states';
 
 /**
  * Custom hook to fetch all projects.
@@ -38,11 +39,16 @@ export const useCreateProject = () => {
  */
 export const useEditProject = () => {
   const queryClient = useQueryClient();
-
+  const {selectedSceneId} = useSceneStore()
   return useMutation({
     mutationFn: (project: CreateProject) => editProject(project),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+        queryClient.invalidateQueries({ queryKey: ['scenes'] });
+        queryClient.invalidateQueries({ queryKey: ['scene', selectedSceneId] });
+        queryClient.invalidateQueries({ queryKey: ['sceneVideo', selectedSceneId] }); 
+      }, 5000) // to avoid polling for celery taks
     },
   });
 };

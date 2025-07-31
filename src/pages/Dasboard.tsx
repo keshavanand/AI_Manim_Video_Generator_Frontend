@@ -7,7 +7,7 @@ import CodeOutput from "@/components/manimLayout/CodeOutput";
 import ProjectList from "@/components/manimLayout/ProjectList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
-import { useProjectStore } from "@/store/states";
+import { useProjectStore, useSceneStore } from "@/store/states";
 import { useScene, useScenes } from "@/hooks/useScene";
 
 export default function Dashboard() {
@@ -19,7 +19,7 @@ export default function Dashboard() {
   const  updateMutation = useUpdateProject()
   const deleteMutation = useDeleteProject()
   const {data: scenes=[]} = useScenes(currentProject?.id || "");
-  const [selectedSceneId, setSelectedSceneId] = useState<string | undefined>(undefined);
+  const {selectedSceneId, setSelectedSceneId} = useSceneStore();
   const { data: selectedScene} = useScene(selectedSceneId)
 
   // Handle project edit

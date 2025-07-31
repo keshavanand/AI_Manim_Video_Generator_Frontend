@@ -58,6 +58,24 @@ export const useProjectStore = create<ProjectStore>()(
     }
   )
 );
+
+interface SceneStore {
+    selectedSceneId: string | undefined;
+    setSelectedSceneId: (id: string | undefined) => void;
+}
+
+export const useSceneStore = create<SceneStore>()(
+  persist(
+    (set) => ({
+      selectedSceneId: undefined,
+      setSelectedSceneId: (id) => set({ selectedSceneId: id }),
+    }),
+    {
+      name: 'project-storage', // localStorage key
+    }
+  )
+);
+
 interface PromptStore{
     prompt: string | '',
     setPrompt: (value: string) => void
