@@ -8,7 +8,7 @@ import debounce from "lodash.debounce";
 interface CodeEditorProps {
   scenes: Scene[];
   selectedScene?: Scene;
-  setSelectedScene: (scene: Scene) => void;
+  setSelectedSceneId: (sceneId: string) => void;
   placeholder?: string;
   className?: string;
 }
@@ -16,7 +16,7 @@ interface CodeEditorProps {
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   scenes=[],
   selectedScene,
-  setSelectedScene,
+  setSelectedSceneId,
   placeholder = "Type your code here...",
   className = "",
 }) => {
@@ -53,7 +53,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         const onChangeCode = (value: string| undefined)=>{
             if (!selectedScene) return;
             const updatedScene = { ...selectedScene, scene_code: value };
-            setSelectedScene(updatedScene)
             debouncedUpdate(updatedScene)
           }
 
@@ -72,11 +71,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                     <button
                       className={`w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition font-medium
                         ${
-                          selectedScene === scene
+                          selectedScene?.id === scene.id
                             ? "bg-gradient-to-r from-cyan-600/80 to-blue-600/80 text-white shadow ring-2 ring-cyan-400"
                             : "hover:bg-cyan-900/40 text-cyan-100"
                         }`}
-                      onClick={() => setSelectedScene(scene)}
+                      onClick={() => setSelectedSceneId(scene.id)}
                     >
                       <FileText className="w-4 h-4 flex-shrink-0" />
                       <span className="truncate" title={scene.scene_name}>{scene.scene_name}</span>

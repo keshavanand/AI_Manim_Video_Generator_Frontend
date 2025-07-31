@@ -1,4 +1,4 @@
-import { createScene, getScenes, updateScene , runScene} from "@/api/sceneAPI"
+import { createScene, getScenes, updateScene , runScene, getScene} from "@/api/sceneAPI"
 import { type Scene, type CreateScene, type UpdateScene } from "@/zodTypes/scene"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
@@ -16,10 +16,19 @@ export const useRunScene = () => {
     onSuccess: (_, scene_id) => {
       // Refetch the scene or scenes list after running
       queryClient.invalidateQueries({ queryKey: ['scenes'] });
-      queryClient.invalidateQueries({ queryKey: ['scene', scene_id] }); // if you have a single scene query
+      queryClient.invalidateQueries({ queryKey: ['scene', scene_id] });
+      queryClient.invalidateQueries({ queryKey: ['sceneVideo', scene_id] }); // if you have a single scene query
     },
   });
 };
+
+export const useScene = (sceneId?: string) =>{
+  return useQuery<Scene>({
+    queryKey: ['scene', sceneId],
+    queryFn: ()=> getScene(sceneId!),
+    enabled: !!sceneId 
+  })
+}
 
 export const useCreateScene = () => {
     const queryClient = useQueryClient();
@@ -41,7 +50,7 @@ export const useUpdateScene = () =>{
       updateData
     }: {id: string,updateData: UpdateScene}) => updateScene(id,updateData),
     onSuccess: ()=>{
-      queryClient.invalidateQueries({queryKey:['scenes']})
+      queryClient.invalidateQueries({queryKey:['scenes']});
     }
   })
 }

@@ -8,8 +8,7 @@ import ProjectList from "@/components/manimLayout/ProjectList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
 import { useProjectStore } from "@/store/states";
-import { useScenes } from "@/hooks/useScene";
-import type { Scene } from "@/zodTypes/scene";
+import { useScene, useScenes } from "@/hooks/useScene";
 
 export default function Dashboard() {
   const [showProjectList, setShowProjectList] = useState(false);
@@ -20,7 +19,8 @@ export default function Dashboard() {
   const  updateMutation = useUpdateProject()
   const deleteMutation = useDeleteProject()
   const {data: scenes=[]} = useScenes(currentProject?.id || "");
-  const [selectedScene, setSelectedScene] = useState<Scene>();
+  const [selectedSceneId, setSelectedSceneId] = useState<string | undefined>(undefined);
+  const { data: selectedScene} = useScene(selectedSceneId)
 
   // Handle project edit
   const handleProjectEdit = () => {
@@ -170,7 +170,7 @@ export default function Dashboard() {
       <aside className="flex-1 bg-[#18181b] flex h-full overflow-hidden">
         {/* Left: Code Editor */}
         <div className="flex w-[70%] min-w-[300px] h-full border-r border-[#232323]">
-          <CodeEditor scenes={scenes} selectedScene={selectedScene} setSelectedScene={(scene)=> setSelectedScene(scene)} />
+          <CodeEditor scenes={scenes} selectedScene={selectedScene} setSelectedSceneId={(id)=> setSelectedSceneId(id)} />
         </div>
 
         {/* Right: Video on top, Output below */}

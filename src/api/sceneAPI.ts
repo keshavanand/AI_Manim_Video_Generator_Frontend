@@ -33,3 +33,12 @@ export async function runScene(id: string) {
     const response = await instance.post(`/scene/run_scene/${id}`);
     return response.data
 }
+export async function getScene(scene_id: string): Promise<Scene>{
+    const response = await instance.get<Scene>("/scene/get_scene",{
+        params:{
+            sceneID: scene_id,
+        }
+    })
+    console.log(scene_id)
+    return response.data
+}
