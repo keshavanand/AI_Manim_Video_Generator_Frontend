@@ -118,7 +118,7 @@ export default function Project() {
 					))}
 				</div>
 				{/* Import from */}
-				<div className="flex items-center gap-3 mb-5">
+				{/* <div className="flex items-center gap-3 mb-5">
 					<span className="text-[#b3b3b3] text-xs">or import from</span>
 					<button className="flex items-center gap-2 bg-[#232323] hover:bg-cyan-500/20 text-white px-3 py-1.5 rounded-full text-xs border border-[#232323]">
 						<Figma className="w-4 h-4" /> Figma
@@ -126,7 +126,7 @@ export default function Project() {
 					<button className="flex items-center gap-2 bg-[#232323] hover:bg-cyan-500/20 text-white px-3 py-1.5 rounded-full text-xs border border-[#232323]">
 						<Github className="w-4 h-4" /> GitHub
 					</button>
-				</div>
+				</div> */}
 				{/* Quick actions */}
 				<div className="flex flex-wrap gap-2 justify-center">
 					<button className="bg-[#232323] hover:bg-cyan-500/20 text-white px-3 py-1.5 rounded-full text-xs border border-[#232323]">

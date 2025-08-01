@@ -37,7 +37,7 @@ class Pythagoras(Scene):
         self.play(Create(square))
         # ...more code...
 `;
-  const demoVideo = "https://www.w3schools.com/html/mov_bbb.mp4";
+  const demoVideo = "src/Demo.mp4";
 
   // Feature hover state
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
@@ -146,9 +146,11 @@ class Pythagoras(Scene):
             <div className="bg-[#18181b] border border-[#232323] rounded-lg p-4 flex items-center justify-center">
               <video
                 src={demoVideo}
-                controls
+                autoPlay
+                muted
+                playsInline
+                loop
                 className="rounded-lg w-full max-w-md bg-black border border-[#232323]"
-                poster="https://dummyimage.com/400x225/18181b/232323.png&text=Demo"
               />
             </div>
           </div>
