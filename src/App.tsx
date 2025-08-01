@@ -17,7 +17,7 @@ function App() {
           <ProtectedRoute>
             <Project/>
           </ProtectedRoute>} />
-        <Route path="/" element={<Project />} />
+        <Route path="/" element={<Home />} />
         <Route
           path="/dashboard"
           element={
