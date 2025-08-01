@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight, Github, Figma } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { useCreateProject } from "@/hooks/useProject";
 import { useProjectStore } from "@/store/states";
 const suggestions = [
