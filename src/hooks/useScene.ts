@@ -1,6 +1,7 @@
 import { createScene, getScenes, updateScene , runScene, getScene} from "@/api/sceneAPI"
 import { type Scene, type CreateScene, type UpdateScene } from "@/zodTypes/scene"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMemo } from "react";
 
 export const useScenes = (project_id: string) =>
   useQuery<Scene[]>({
@@ -53,5 +54,11 @@ export const useUpdateScene = () =>{
       queryClient.invalidateQueries({queryKey:['scenes']});
     }
   })
+}
+
+export function useSceneErrors(scenes: Scene[]){
+  return useMemo(()=>{
+    return scenes.filter(scene => scene.status=='error');
+  },[scenes]);
 }
 

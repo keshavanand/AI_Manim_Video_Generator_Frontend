@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MoreVertical, FileVideo, FileCode2, X} from "lucide-react";
-import ChatInterface from "@/components/manimLayout/ChatInterface";
+import {ChatInterface} from "@/components/manimLayout/ChatInterface";
 import VideoPlayer from "@/components/manimLayout/VideoPlayer";
 import CodeEditor from "@/components/manimLayout/CodeEditor";
 import CodeOutput from "@/components/manimLayout/CodeOutput";
@@ -8,7 +8,7 @@ import ProjectList from "@/components/manimLayout/ProjectList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteProject, useUpdateProject } from "@/hooks/useProject";
 import { useProjectStore, useSceneStore } from "@/store/states";
-import { useScene, useScenes } from "@/hooks/useScene";
+import { useScene, useSceneErrors, useScenes } from "@/hooks/useScene";
 
 export default function Dashboard() {
   const [showProjectList, setShowProjectList] = useState(false);
@@ -21,6 +21,7 @@ export default function Dashboard() {
   const {data: scenes=[]} = useScenes(currentProject?.id || "");
   const {selectedSceneId, setSelectedSceneId} = useSceneStore();
   const { data: selectedScene} = useScene(selectedSceneId)
+  const errorScenes = useSceneErrors(scenes);
 
   // Handle project edit
   const handleProjectEdit = () => {
@@ -164,7 +165,7 @@ export default function Dashboard() {
         {/* Chat Section (left) */}
         <section className="flex flex-col justify-center items-center h-full w-[30vw] min-w-[260px] max-w-[340px] bg-[#18181b] border-r border-[#232323]">
           <div className="w-full h-full flex flex-col justify-center">
-            <ChatInterface />
+            <ChatInterface errorScenes= {errorScenes}/>
           </div>
         </section>
       <aside className="flex-1 bg-[#18181b] flex h-full overflow-hidden">

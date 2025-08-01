@@ -9,7 +9,8 @@ export const SceneSchema = z.strictObject({
     scene_code: z.string().optional(),
     scene_output: z.string(),
     created_at: z.string().datetime(),
-    updated_at: z.string().datetime(),     
+    updated_at: z.string().datetime(),
+    status: z.string().optional(),     
 });
 
 export const UpdateSceneSchema = z.strictObject({

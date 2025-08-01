@@ -3,8 +3,16 @@ import { Send, Sparkles } from "lucide-react";
 import { useProjectStore } from "@/store/states";
 import { useEditProject } from "@/hooks/useProject";
 import { useChat } from "@/hooks/useChat";
+import type { Scene } from "@/zodTypes/scene";
+import { ErrorFixPanel } from "./ErrorFixPanel";
 
-export default function ChatInterface() {
+interface ChatProps{
+  errorScenes: Scene[];
+}
+
+export const ChatInterface: React.FC<ChatProps>=({
+  errorScenes = [],
+})=>{
   const { currentProject } = useProjectStore();
   const createMutation = useEditProject();
   const [input, setInput] = useState("");
@@ -66,6 +74,21 @@ export default function ChatInterface() {
     }
   };
 
+  const handleErrorFix = async (scene:Scene) =>{
+    setIsLoading(true);
+    try{
+      await createMutation.mutateAsync({
+        id: currentProject?.id,
+        prompt: scene.scene_output + "Fix this error"
+      })
+      await refetch();
+    }catch (error){
+      console.log("Error", error)
+    }finally{
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col h-full w-full bg-gradient-to-br from-[#18181b] via-[#15171a] to-[#1a222d] rounded-2xl shadow-xl border border-[#232323]">
       {/* Chat Header */}
@@ -92,6 +115,9 @@ export default function ChatInterface() {
               </div>
             </div>
           )
+        )}
+        {errorScenes.length > 0 && (
+          <ErrorFixPanel scenes={errorScenes} onFix={handleErrorFix} />
         )}
         {isLoading && (
           <div className="flex items-start gap-2">
