@@ -2,6 +2,7 @@
 
 import { type CreateProject, type Project, type Projects, type UpdateProject } from "@/zodTypes/project";
 import instance from "./axiosInstance";
+import { useAuthStore, useGlobalAuthCheck } from "@/store/states";
 
 /**
  * Creates a new project.
@@ -46,4 +47,47 @@ export async function updateProject(id: string, updateData: UpdateProject): Prom
 export async function deleteProject(id: string): Promise<string> {
     const response = await instance.delete<string>(`/project/delete_project/${id}`);
     return response.data;
+}
+
+export async function enhancePrompt(prompt: string): Promise<Response> {
+  const { token, alpha_token } = useAuthStore.getState();
+  const baseURL = import.meta.env.VITE_BASE_URL;
+
+  const url = `${baseURL}project/enhance_prompt?prompt=${encodeURIComponent(prompt)}`;
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'X-Custom-Header': 'foobar',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    
+  }
+  if(alpha_token){
+    headers['alpha-token'] = alpha_token;
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+  });
+
+  // Optional: handle 401 like your Axios response interceptor
+  if (response.status === 401) {
+    try {
+      const data = await response.json();
+      if (data.detail === 'expired') {
+        useGlobalAuthCheck.getState().setIsTokExpired(true);
+      }
+    } catch (err) {
+      console.warn("Failed to parse error response", err);
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(`Enhance prompt failed with status ${response.status}`);
+  }
+
+  return response;
 }

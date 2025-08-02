@@ -4,6 +4,7 @@ import {
   updateProject,
   deleteProject,
   editProject,
+  enhancePrompt,
 } from '@/api/projectAPI';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CreateProject, Projects, UpdateProject as UpdateProjectType } from '@/zodTypes/project';
@@ -87,4 +88,10 @@ export const useDeleteProject = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },
   });
+};
+
+export const useEnhancePrompt = ()=>{
+   return useMutation({
+    mutationFn: (prompt:string) => enhancePrompt(prompt)
+  })
 };

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { useCreateProject } from "@/hooks/useProject";
+import { useCreateProject, useEnhancePrompt } from "@/hooks/useProject";
 import { useProjectStore } from "@/store/states";
 const suggestions = [
 	"Visualize the Pythagorean theorem",
@@ -17,6 +17,38 @@ export default function Project() {
 	const createMutation  = useCreateProject();
 	const [loading, setLoading] = useState(false);
 	const setCurrentProject = useProjectStore((state)=> state.setCurrentProject)
+	const enhancePromptMutation = useEnhancePrompt();
+	const [enhancing, setEnhancing] = useState(false);
+	// const spanRef = useRef<HTMLSpanElement>(null);
+	// const inputRef = useRef<HTMLInputElement>(null);
+	
+	const enhancePrompt = async()=>{
+		if (!prompt.trim()) return;
+
+		setEnhancing(true);
+		setPrompt("");
+
+		try{
+			const response = await enhancePromptMutation.mutateAsync(prompt)
+			if (!response || !response.body) throw new Error("No response body");
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder("utf-8");
+
+
+			while (true){
+				const {value, done} = await reader.read();
+				if(done) break;
+				const chunk = decoder.decode(value,{stream:true});
+				setPrompt((prev)=> prev + chunk);
+			}
+
+		}catch (error){
+			console.error("Enhance error:", error);
+		}finally{
+			setEnhancing(false);
+		}
+	}
 
 	// Replace with your actual project creation logic
 	const createProject = async (prompt: string) => {
@@ -88,20 +120,38 @@ export default function Project() {
 						onChange={(e) => setPrompt(e.target.value)}
 						autoFocus
 					/>
-					{loading ? (
-						<Button disabled className="self-end bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-							Creating...</Button>
-						):(<Button
-							type="submit"
-							size="sm"
-							className="self-end bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs"
-							disabled={!prompt.trim()}
+
+					<div className="flex justify-between items-center gap-3">
+						<Button
+							type="button"
+							className="text-white border border-cyan-500 hover:bg-cyan-500 hover:text-black text-xs px-3 py-1.5 flex items-center gap-1"
+							onClick={enhancePrompt}
+							disabled={!prompt.trim() || enhancing}
+						>
+							{enhancing ? "Enhancing..." : "Enhance Prompt"}
+							<Sparkles className="w-4 h-4" />
+						</Button>
+
+						{loading ? (
+							<Button
+								disabled
+								className="bg-cyan-500 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs"
 							>
-								Start Project{" "}
-								<ArrowRight className="w-4 h-4" />
+								Creating...
+							</Button>
+						) : (
+							<Button
+								type="submit"
+								size="sm"
+								className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs"
+								disabled={!prompt.trim()}
+							>
+								Start Project <ArrowRight className="w-4 h-4" />
 							</Button>
 						)}
+					</div>
 				</form>
+
 				{/* Suggestions */}
 				<div className="flex flex-wrap gap-2 justify-center mb-5">
 					{suggestions.map((s, i) => (
