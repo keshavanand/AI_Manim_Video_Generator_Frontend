@@ -4,7 +4,7 @@ import {BrowserRouter} from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 
 // 1. Create a client
 const queryClient = new QueryClient();
